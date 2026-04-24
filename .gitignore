@@ -1,0 +1,41 @@
+# Dépendances
+node_modules/
+
+# Fichiers de log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Fichiers d'environnement (Variables secrètes)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build et fichiers générés (Vite/React)
+front/dist/
+front/build/
+
+# Caches
+.npm
+.eslintcache
+.vite/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Configuration des éditeurs de code
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Fichiers de couverture de tests
+coverage/
+*.lcov
