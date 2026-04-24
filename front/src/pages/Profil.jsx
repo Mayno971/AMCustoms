@@ -8,6 +8,10 @@ function Profil() {
   const [user, setUser] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
+
   useEffect(() => {
     // On récupère l'utilisateur connecté depuis le localStorage
     const currentUser = JSON.parse(localStorage.getItem('am_customs_current_user'));
@@ -84,6 +88,10 @@ function Profil() {
   const upcomingCount = history.filter(h => h.status === 'En attente').length;
   const completedCount = history.filter(h => h.status === 'Terminé').length;
 
+  // Logique de pagination
+  const totalPages = Math.ceil(sortedHistory.length / ITEMS_PER_PAGE);
+  const paginatedHistory = sortedHistory.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   return (
     <div className="profil-page">
       <div className="profil-container">
@@ -132,8 +140,8 @@ function Profil() {
           <section className="profil-card lg-span-2">
             <h2 className="card-heading">Historique des Prestations</h2>
             <div className="history-list">
-              {sortedHistory.length > 0 ? (
-                sortedHistory.map((item) => (
+              {paginatedHistory.length > 0 ? (
+                paginatedHistory.map((item) => (
                   <div key={item.id} className="history-item">
                     <div className="history-main">
                       <h3 className="history-action">{item.action}</h3>
@@ -157,6 +165,22 @@ function Profil() {
                 <p className="empty-history">Vous n'avez aucune prestation réservée pour le moment.</p>
               )}
             </div>
+            
+            {totalPages > 1 && (
+              <div className="pagination-controls">
+                <button 
+                  disabled={currentPage === 1} 
+                  onClick={() => setCurrentPage(prev => prev - 1)}
+                  className="btn-pagination"
+                >Précédent</button>
+                <span className="pagination-info">Page {currentPage} sur {totalPages}</span>
+                <button 
+                  disabled={currentPage === totalPages} 
+                  onClick={() => setCurrentPage(prev => prev + 1)}
+                  className="btn-pagination"
+                >Suivant</button>
+              </div>
+            )}
           </section>
 
         </div>

@@ -15,16 +15,17 @@ function Accueil() {
   const [toastMessage, setToastMessage] = useState('');
   const [bookedSlots, setBookedSlots] = useState([]);
 
-  // États pour la réservation Invité (Guest)
   const [guestFirstname, setGuestFirstname] = useState('');
   const [guestLastname, setGuestLastname] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
 
-  // Date de demain au format YYYY-MM-DD (Réservation minimum à J+1)
   const tomorrowDate = new Date();
   tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-  const tomorrow = tomorrowDate.toISOString().split('T')[0];
+  const year = tomorrowDate.getFullYear();
+  const month = String(tomorrowDate.getMonth() + 1).padStart(2, '0');
+  const day = String(tomorrowDate.getDate()).padStart(2, '0');
+  const tomorrow = `${year}-${month}-${day}`;
   
   useEffect(() => {
     if (!bookingDate) {
@@ -34,12 +35,11 @@ function Accueil() {
 
     const fetchBookedSlots = async () => {
       try {
-        // Requête GET vers votre futur serveur pour vérifier les dispos
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
         const response = await fetch(`${API_URL}/api/appointments?date=${bookingDate}`);
         if (response.ok) {
           const data = await response.json();
-          setBookedSlots(data.bookedTimes); // Le serveur renvoie ex: ['09:00', '14:00']
+          setBookedSlots(data.bookedTimes); 
           return;
         }
       } catch (error) {
@@ -75,6 +75,13 @@ function Accueil() {
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
     if (!bookingDate || !bookingTime) return;
+    
+    // Sécurité supplémentaire : blocage si la date est antérieure à demain
+    if (bookingDate < tomorrow) {
+      setToastMessage("Les réservations se font uniquement à partir de demain.");
+      setTimeout(() => setToastMessage(''), 5000);
+      return;
+    }
 
     const currentUser = JSON.parse(localStorage.getItem('am_customs_current_user'));
     const isGuest = !currentUser;
@@ -94,7 +101,6 @@ function Accueil() {
     };
     
     try {
-      // Requête POST pour envoyer la réservation au serveur
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const response = await fetch(`${API_URL}/api/appointments`, {
         method: 'POST',
@@ -107,8 +113,7 @@ function Accueil() {
     } catch (error) {
       console.error("Serveur inaccessible, sauvegarde locale uniquement.", error);
     }
-
-    // Sauvegarde locale (Fallback pour que le site continue de fonctionner instantanément)
+    
     if (!isGuest) {
       const updatedUser = { 
         ...currentUser, 

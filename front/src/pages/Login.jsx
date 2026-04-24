@@ -87,6 +87,9 @@ function Login() {
           <div className="form-group">
             <label htmlFor="password">Mot de passe</label>
             <input type="password" id="password" placeholder="••••••••" value={formData.password} onChange={handleChange} required />
+            <Link to="/forgot-password" style={{ fontSize: '0.875rem', color: 'var(--text-gray)', textAlign: 'right', marginTop: '0.25rem', textDecoration: 'underline' }}>
+              Mot de passe oublié ?
+            </Link>
           </div>
           
           <button type="submit" className="btn-submit">Se connecter</button>

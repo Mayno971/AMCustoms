@@ -125,11 +125,25 @@ app.post('/api/auth/login', (req, res) => {
   res.json({ message: 'Connexion réussie.', user });
 });
 
+// 6. Réinitialisation du mot de passe (Forgot Password)
+app.post('/api/auth/reset-password', (req, res) => {
+  const { email, phone, newPassword } = req.body;
+  
+  const user = users.find(u => u.email === email && u.phone === phone);
+  
+  if (!user) {
+    return res.status(404).json({ error: 'Aucun compte ne correspond à cet e-mail et numéro de téléphone.' });
+  }
+
+  user.password = newPassword;
+  res.json({ message: 'Mot de passe réinitialisé avec succès.' });
+});
+
 // ==========================================
 // ROUTES: ADMINISTRATEUR (ADMIN)
 // ==========================================
 
-// 6. Obtenir tous les utilisateurs (Profils)
+// 7. Obtenir tous les utilisateurs (Profils)
 app.get('/api/admin/users', (req, res) => {
   // On renvoie les utilisateurs en masquant les mots de passe par sécurité
   const safeUsers = users.map(u => ({

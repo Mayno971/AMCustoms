@@ -5,6 +5,7 @@ import Profil from './pages/Profil';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
+import ForgotPassword from './pages/ForgotPassword';
 import './App.css';
 
 function AppContent() {
@@ -81,6 +82,7 @@ function AppContent() {
             <Route path="/profil/:nom" element={<Profil />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/admin" element={<Admin />} />
             
             {/* Page 404 Stylisée */}

@@ -15,6 +15,10 @@ function Admin() {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('day'); // 'day' ou 'week'
   const [selectedApptDetails, setSelectedApptDetails] = useState(null); // État pour la modale de détails
+  
+  // Pagination pour les clients
+  const [usersCurrentPage, setUsersCurrentPage] = useState(1);
+  const USERS_PER_PAGE = 8;
 
   useEffect(() => {
     // Sécurité : on vérifie que c'est bien l'admin qui est connecté
@@ -118,6 +122,10 @@ function Admin() {
      u.lastname.toLowerCase().includes(searchQuery.toLowerCase()) || 
      u.email.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+  
+  // Pagination logique pour les clients
+  const totalUserPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
+  const paginatedUsers = filteredUsers.slice((usersCurrentPage - 1) * USERS_PER_PAGE, usersCurrentPage * USERS_PER_PAGE);
 
   // --- Logique de navigation du Calendrier ---
   const adjustDate = (days) => {
@@ -332,7 +340,7 @@ function Admin() {
                   className="admin-search-input" 
                   placeholder="Rechercher par nom, email..." 
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => { setSearchQuery(e.target.value); setUsersCurrentPage(1); }}
                 />
               </div>
               
@@ -347,8 +355,8 @@ function Admin() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredUsers.length > 0 ? (
-                      filteredUsers.map((u, idx) => (
+                    {paginatedUsers.length > 0 ? (
+                      paginatedUsers.map((u, idx) => (
                         <tr key={idx}>
                           <td>
                             <div className="table-client-info">
@@ -373,12 +381,28 @@ function Admin() {
                     ) : (
                       <tr>
                         <td colSpan="4" className="empty-state" style={{textAlign: 'center', padding: '3rem'}}>
-                          Aucun client trouvé pour "{searchQuery}".
+                          Aucun client trouvé pour {searchQuery}.
                         </td>
                       </tr>
                     )}
                   </tbody>
                 </table>
+                
+                {totalUserPages > 1 && (
+                  <div className="pagination-controls">
+                    <button 
+                      disabled={usersCurrentPage === 1} 
+                      onClick={() => setUsersCurrentPage(prev => prev - 1)}
+                      className="btn-pagination"
+                    >Précédent</button>
+                    <span className="pagination-info">Page {usersCurrentPage} sur {totalUserPages}</span>
+                    <button 
+                      disabled={usersCurrentPage === totalUserPages} 
+                      onClick={() => setUsersCurrentPage(prev => prev + 1)}
+                      className="btn-pagination"
+                    >Suivant</button>
+                  </div>
+                )}
               </div>
             </section>
           </div>
