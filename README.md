@@ -8,16 +8,19 @@ Le projet est divisé en deux répertoires principaux :
 - **`front/`** : Application client développée en React (Vite.js). Elle contient l'interface vitrine (Accueil, Réservation), l'espace client (Profil) et l'interface d'administration (Dashboard complet avec gestion des plannings, clients et statuts).
 - **`back/`** : Serveur backend développé en Node.js (Express). Il gère l'API REST pour traiter les réservations et l'authentification.
 
-## 🚀 Installation et Lancement en Local
+## 🚀 Environnement de Développement (Installation Rapide)
 
-Pour lancer le projet sur votre machine, vous devez démarrer le serveur (Backend) et l'interface (Frontend) simultanément dans deux terminaux séparés.
+L'environnement a été optimisé pour lancer le Frontend et le Backend simultanément avec une seule commande, intégrant le rechargement à chaud (Hot Reloading) !
 
-### 1. Démarrer le Serveur (Backend)
-Ouvrez un terminal, placez-vous dans le dossier `back` et exécutez les commandes suivantes :
+### Prérequis
+- Node.js (version 18 ou supérieure)
+- Git
+
+### 1. Installation globale des dépendances
+Ouvrez un terminal à la **racine du projet** (`AMCustoms/`) et exécutez :
 ```bash
-cd back
 npm install
-node server.js
+npm run install:all
 ```
 *Le serveur sera actif sur `http://localhost:3000`.*
 
