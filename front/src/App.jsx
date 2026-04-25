@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
 import ForgotPassword from './pages/ForgotPassword';
+import TrackBooking from './pages/TrackBooking';
 import './App.css';
 
 function AppContent() {
@@ -57,11 +58,14 @@ function AppContent() {
             
             {user ? (
               <div className="user-actions">
-                <Link to={user.role === 'admin' ? '/admin' : `/profil/${user.firstname}`} className="nav-profile-btn" title={user.role === 'admin' ? "Espace Administrateur" : "Mon Profil"}>
+                <Link to={user.role === 'admin' ? '/admin' : `/profil/${user.firstname}`} className="nav-profile-btn" aria-label={user.role === 'admin' ? "Espace Administrateur" : "Mon Profil"}>
                   <div className="avatar-circle">
                     {user.role === 'admin' ? 'AD' : `${user.firstname.charAt(0)}${user.lastname ? user.lastname.charAt(0) : ''}`}
                   </div>
                   <span className="profile-name">{user.role === 'admin' ? 'Admin' : user.firstname}</span>
+                  <div className="profile-tooltip">
+                    {user.role === 'admin' ? "Espace Administrateur" : "Accéder à mon profil"}
+                  </div>
                 </Link>
                 <button onClick={handleLogout} className="btn-logout-nav">
                   <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -72,6 +76,9 @@ function AppContent() {
               </div>
             ) : (
               <Link to="/login" className="btn-login-nav">
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
                 SE CONNECTER
               </Link>
             )}
@@ -86,6 +93,7 @@ function AppContent() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/track" element={<TrackBooking />} />
             <Route path="/admin" element={<Admin />} />
             
             {/* Page 404 Stylisée */}

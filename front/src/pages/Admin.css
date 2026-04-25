@@ -102,6 +102,11 @@
   box-shadow: var(--shadow-sm);
 }
 
+.revenue-card {
+  background: linear-gradient(135deg, rgba(8, 145, 178, 0.1) 0%, rgba(18, 24, 38, 1) 100%);
+  border-color: rgba(8, 145, 178, 0.3);
+}
+
 .stat-card-value {
   font-size: 3rem;
   font-weight: 900;
@@ -116,6 +121,62 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+/* Encadré Prochain Rendez-vous */
+.next-appt-hero {
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.15) 0%, rgba(234, 88, 12, 0.02) 100%);
+  border: 1px solid rgba(234, 88, 12, 0.3);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: var(--shadow-orange);
+}
+
+@media (min-width: 768px) {
+  .next-appt-hero {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.next-appt-info { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.next-appt-badge {
+  width: fit-content; background-color: var(--primary-orange); color: white;
+  padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;
+}
+
+.next-appt-client { margin: 0; font-size: 1.75rem; font-weight: 900; color: white; }
+.next-appt-service { margin: 0; color: var(--primary-orange); font-weight: 600; font-size: 1rem;}
+
+.next-appt-time {
+  display: flex; align-items: center; gap: 0.5rem;
+  color: var(--text-gray); font-weight: 600; margin-top: 0.5rem;
+}
+
+.btn-jump-calendar {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background-color: var(--surface-color); color: white;
+  border: 1px solid var(--border-color); padding: 0.875rem 1.5rem;
+  border-radius: 0.75rem; font-weight: 700; font-size: 0.875rem;
+  cursor: pointer; transition: all var(--transition-bouncy);
+}
+
+.btn-jump-calendar:hover { border-color: var(--primary-orange); transform: translateY(-2px); }
+
+/* Bouton Facture */
+.btn-invoice {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: transparent; border: 1px solid var(--primary-cyan);
+  color: var(--primary-cyan); padding: 0.5rem 1rem; border-radius: 0.5rem;
+  font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all var(--transition-smooth);
+}
+.btn-invoice:hover { background-color: var(--primary-cyan); color: white; }
+
 
 .admin-grid {
   display: grid;
@@ -200,26 +261,31 @@
 .date-navigation {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  background-color: var(--bg-color);
+  border-radius: 0.75rem;
+  padding: 0.25rem;
+  border: 1px solid var(--border-color);
 }
 
 .nav-arrow {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
-  color: var(--text-main);
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 0.75rem;
+  background-color: transparent;
+  border: none;
+  color: var(--text-gray);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: all var(--transition-smooth);
 }
 
 .nav-arrow:hover {
-  border-color: var(--primary-orange);
+  background-color: var(--surface-color);
   color: var(--primary-orange);
+  box-shadow: var(--shadow-sm);
 }
 
 .nav-arrow:active {
@@ -547,6 +613,72 @@
 .appt-modal-badge {
   display: inline-block; padding: 0.35rem 1rem; border-radius: 9999px;
   font-size: 0.875rem; font-weight: 700;
-  background-color: var(--bg-color); border: 1px solid var(--border-color);
   width: fit-content;
 }
+
+/* Actions du Service dans la modale */
+.timing-info {
+  background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 1rem; border-radius: 0.75rem; display: flex; justify-content: space-around;
+}
+.timing-info p { margin: 0; font-size: 0.875rem; color: var(--text-main); }
+
+.service-actions { margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; }
+
+.btn-service-start {
+  width: 100%; padding: 1rem; background-color: var(--primary-cyan); color: white;
+  border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer;
+  box-shadow: 0 4px 15px rgba(8, 145, 178, 0.3); transition: all var(--transition-bouncy);
+}
+.btn-service-start:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(8, 145, 178, 0.5); }
+
+.btn-service-end {
+  width: 100%; padding: 1rem; background-color: #10B981; color: white;
+  border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); transition: all var(--transition-bouncy);
+}
+.btn-service-end:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5); }
+
+.service-start-form {
+  display: flex; flex-direction: column; gap: 0.75rem;
+  background-color: var(--bg-color); padding: 1.5rem; border-radius: 0.75rem; border: 1px solid var(--border-color);
+}
+.service-start-form label { font-size: 0.875rem; font-weight: 700; color: var(--text-gray); }
+.form-row-inline { display: flex; gap: 0.5rem; align-items: center; }
+.time-input {
+  background-color: var(--surface-color); border: 1px solid var(--border-color);
+  color: white; padding: 0.75rem; border-radius: 0.5rem; color-scheme: dark; font-weight: 700;
+}
+.btn-service-confirm {
+  flex: 1; padding: 0.75rem; background-color: var(--primary-orange); color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer;
+}
+.btn-service-cancel {
+  padding: 0.75rem 1rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-gray); border-radius: 0.5rem; font-weight: 700; cursor: pointer;
+}
+.btn-service-cancel:hover { background: var(--surface-color); color: white; }
+
+/* Actions Documentaires (Factures) */
+.doc-actions {
+  display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;
+}
+
+.btn-doc {
+  padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 700;
+  cursor: pointer; transition: all var(--transition-smooth); border: 1px solid transparent;
+}
+
+.btn-doc.export {
+  background-color: var(--bg-color); border-color: var(--border-color); color: var(--text-main);
+}
+.btn-doc.export:hover { background-color: var(--surface-color); border-color: var(--text-gray); }
+
+.btn-doc.export-main {
+  background-color: rgba(8, 145, 178, 0.1); border-color: rgba(8, 145, 178, 0.3); color: var(--primary-cyan);
+}
+.btn-doc.export-main:hover { background-color: var(--primary-cyan); color: white; }
+
+.btn-doc.import {
+  background-color: transparent; border-color: var(--border-color); color: var(--text-gray);
+  display: flex; align-items: center; justify-content: center; padding: 0.5rem;
+}
+.btn-doc.import:hover { border-color: #10B981; color: #10B981; }

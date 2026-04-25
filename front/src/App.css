@@ -165,6 +165,7 @@ h1, h2, h3, h4, h5, h6, .nav-brand {
   text-decoration: none;
   transition: all var(--transition-smooth);
   font-family: 'Outfit', sans-serif;
+  position: relative;
 }
 
 .avatar-circle {
@@ -191,7 +192,52 @@ h1, h2, h3, h4, h5, h6, .nav-brand {
   transform: translateY(-1px);
 }
 
+/* --- Infobulle (Tooltip) du Profil --- */
+.profile-tooltip {
+  position: absolute;
+  top: 130%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background-color: var(--surface-color);
+  color: var(--text-main);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-smooth);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  pointer-events: none; /* Empêche la souris d'interagir avec la boîte directement */
+}
+
+.profile-tooltip::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background-color: var(--surface-color);
+  border-left: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-color);
+}
+
+.nav-profile-btn:hover .profile-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
 .btn-login-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   background-color: var(--primary-orange);
   color: white;
   padding: 0.5rem 1.25rem;
@@ -229,7 +275,7 @@ h1, h2, h3, h4, h5, h6, .nav-brand {
 
 .btn-logout-nav:hover {
   color: #ef4444;
-  background-color: #fee2e2;
+  background-color: #838282;
 }
 .btn-logout-nav:active {
   transform: scale(0.95);

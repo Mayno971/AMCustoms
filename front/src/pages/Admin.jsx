@@ -16,6 +16,9 @@ function Admin() {
   const [viewMode, setViewMode] = useState('day'); // 'day' ou 'week'
   const [selectedApptDetails, setSelectedApptDetails] = useState(null); // État pour la modale de détails
   
+  const [showStartForm, setShowStartForm] = useState(false);
+  const [startTimeInput, setStartTimeInput] = useState('');
+  
   // Pagination pour les clients
   const [usersCurrentPage, setUsersCurrentPage] = useState(1);
   const USERS_PER_PAGE = 8;
@@ -30,6 +33,30 @@ function Admin() {
 
     fetchAdminData();
   }, [navigate]);
+
+  // Système d'alertes automatiques (Rappels)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      appointments.forEach(appt => {
+        if (appt.status === 'En attente') {
+          const [datePart, timePart] = appt.date.split(' à ');
+          const apptDate = new Date(`${datePart}T${timePart}:00`);
+          
+          const diffMs = apptDate.getTime() - now.getTime();
+          const diffMins = Math.floor(diffMs / 60000); // Conversion en minutes
+
+          // Déclenchement des alertes
+          if (diffMins === 60) {
+            alert(`RAPPEL IMMINENT : Le client ${appt.clientName} arrive dans 1 heure !`);
+          } else if (diffMins === 15) {
+            alert(`ALERTE : Le rendez-vous de ${appt.clientName} commence dans 15 minutes. Préparez l'atelier.`);
+          }
+        }
+      });
+    }, 60000); // Vérification toutes les minutes
+    return () => clearInterval(interval);
+  }, [appointments]);
 
   const fetchAdminData = async () => {
     try {
@@ -67,13 +94,13 @@ function Admin() {
   };
 
   // Permet à l'admin de changer l'état d'un RDV
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = async (id, newStatus, startTime = null, endTime = null) => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const response = await fetch(`${API_URL}/api/admin/appointments/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus, startTime, endTime })
       });
       if (!response.ok) throw new Error('Erreur serveur');
     } catch (error) {
@@ -82,7 +109,7 @@ function Admin() {
 
     // Mise à jour de l'affichage local
     const updatedAppts = appointments.map(appt => 
-      appt.id === id ? { ...appt, status: newStatus } : appt
+      appt.id === id ? { ...appt, status: newStatus, ...(startTime && {startTime}), ...(endTime && {endTime}) } : appt
     );
     setAppointments(updatedAppts);
 
@@ -90,7 +117,7 @@ function Admin() {
     const localUsers = JSON.parse(localStorage.getItem('am_customs_users')) || [];
     const updatedUsers = localUsers.map(u => {
       if (u.appointments) {
-        u.appointments = u.appointments.map(a => a.id === id ? { ...a, status: newStatus } : a);
+        u.appointments = u.appointments.map(a => a.id === id ? { ...a, status: newStatus, ...(startTime && {startTime}), ...(endTime && {endTime}) } : a);
       }
       return u;
     });
@@ -107,13 +134,56 @@ function Admin() {
     }
   };
 
+  // Démarrer la prestation
+  const confirmStartService = async (appt) => {
+    if (!startTimeInput) return alert("Veuillez saisir l'heure de début.");
+    await handleStatusChange(appt.id, 'En cours', startTimeInput, null);
+    
+    setShowStartForm(false);
+    setStartTimeInput('');
+    setSelectedApptDetails({...appt, status: 'En cours', startTime: startTimeInput});
+  };
+
+  // Terminer la prestation
+  const confirmEndService = async (appt) => {
+    const endTime = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', ':');
+    if(!window.confirm(`Confirmer la fin de la prestation pour ${appt.clientName} à ${endTime} ?`)) return;
+    
+    await handleStatusChange(appt.id, 'Terminé', appt.startTime, endTime);
+    setSelectedApptDetails({...appt, status: 'Terminé', endTime: endTime});
+    
+    // On bascule automatiquement sur l'onglet facture
+    setActiveTab('invoices');
+  };
+
   // Filtrer les rendez-vous pour la date sélectionnée (Le Calendrier)
   const appointmentsForDate = appointments.filter(appt => appt.date.startsWith(selectedDate));
+
+  // Trouver le prochain rendez-vous à venir (Futur)
+  const now = new Date();
+  const upcomingAppts = appointments.filter(a => {
+    if (a.status !== 'En attente' && a.status !== 'En cours') return false;
+    const [datePart, timePart] = a.date.split(' à ');
+    const apptDate = new Date(`${datePart}T${timePart}:00`);
+    return apptDate > now;
+  }).sort((a, b) => {
+    const dateA = new Date(a.date.replace(' à ', 'T') + ':00');
+    const dateB = new Date(b.date.replace(' à ', 'T') + ':00');
+    return dateA - dateB;
+  });
+  const nextAppointment = upcomingAppts.length > 0 ? upcomingAppts[0] : null;
 
   // Statistiques globales
   const totalClients = users.filter(u => u.role !== 'admin').length;
   const pendingAppts = appointments.filter(a => a.status === 'En attente').length;
   const completedAppts = appointments.filter(a => a.status === 'Terminé').length;
+  
+  // Calcul du chiffre d'affaires estimé (Extraction des chiffres du prix "À partir de XX €")
+  const totalRevenue = appointments.filter(a => a.status === 'Terminé').reduce((sum, a) => {
+    if (!a.price) return sum;
+    const match = String(a.price).match(/\d+/);
+    return sum + (match ? parseInt(match[0], 10) : 0);
+  }, 0);
 
   // Filtrage des utilisateurs pour la recherche
   const filteredUsers = users.filter(u => 
@@ -126,6 +196,11 @@ function Admin() {
   // Pagination logique pour les clients
   const totalUserPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
   const paginatedUsers = filteredUsers.slice((usersCurrentPage - 1) * USERS_PER_PAGE, usersCurrentPage * USERS_PER_PAGE);
+
+  // Simulation de la gestion documentaire
+  const handleDocument = (type, appt) => {
+    alert(`${type} pour ${appt.clientName} (Prestation n°${appt.id}) traité avec succès !`);
+  };
 
   // --- Logique de navigation du Calendrier ---
   const adjustDate = (days) => {
@@ -229,11 +304,41 @@ function Admin() {
             <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
             Base Clients
           </button>
+          <button className={`admin-tab-btn ${activeTab === 'invoices' ? 'active' : ''}`} onClick={() => setActiveTab('invoices')}>
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            Facturation
+          </button>
         </nav>
 
         {/* ONGLET 1 : VUE D'ENSEMBLE */}
         {activeTab === 'overview' && (
           <div className="tab-content fade-in">
+            
+            {/* CARTE : PROCHAIN RENDEZ-VOUS */}
+            {nextAppointment && (
+              <div className="next-appt-hero">
+                <div className="next-appt-info">
+                  <span className="next-appt-badge">Prochain rendez-vous</span>
+                  <h3 className="next-appt-client">{nextAppointment.clientName}</h3>
+                  <p className="next-appt-service">{nextAppointment.action} — <span style={{color: 'var(--text-main)'}}>{nextAppointment.carModel}</span></p>
+                  <div className="next-appt-time">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    {nextAppointment.date}
+                  </div>
+                </div>
+                <div className="next-appt-actions">
+                  <button className="btn-jump-calendar" onClick={() => {
+                    setSelectedDate(nextAppointment.date.split(' à ')[0]);
+                    setActiveTab('appointments');
+                    setViewMode('day');
+                  }}>
+                    Voir dans le calendrier
+                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="stats-grid">
               <div className="stat-card">
                 <span className="stat-card-value">{pendingAppts}</span>
@@ -246,6 +351,10 @@ function Admin() {
               <div className="stat-card">
                 <span className="stat-card-value">{totalClients}</span>
                 <span className="stat-card-label">Clients inscrits</span>
+              </div>
+              <div className="stat-card revenue-card">
+                <span className="stat-card-value">{totalRevenue} €</span>
+                <span className="stat-card-label">Chiffre d'affaires estimé</span>
               </div>
             </div>
             
@@ -407,15 +516,72 @@ function Admin() {
             </section>
           </div>
         )}
+
+        {/* ONGLET 4 : FACTURATION */}
+        {activeTab === 'invoices' && (
+          <div className="tab-content fade-in">
+            <section className="admin-card">
+              <div className="card-header-flex">
+                <h2 className="card-heading">Contrats & Facturation</h2>
+                <p style={{color: 'var(--text-gray)', fontSize: '0.875rem'}}>Éditez et gérez les documents contractuels de vos clients.</p>
+              </div>
+              
+              <div className="admin-table-container">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>N° Facture</th>
+                      <th>Date d'édition</th>
+                      <th>Client & Prestation</th>
+                      <th>Montant</th>
+                      <th>Gestion Documentaire</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {appointments.filter(a => a.status === 'Terminé').reverse().map((appt, idx) => (
+                      <tr key={idx}>
+                        <td><span style={{fontWeight: '700', color: 'var(--primary-cyan)'}}>FAC-{appt.id.toString().slice(-6)}</span></td>
+                        <td>{appt.date.split(' à ')[0]}</td>
+                        <td>
+                          <div style={{display: 'flex', flexDirection: 'column'}}>
+                            <span style={{fontWeight: '700', color: 'var(--text-main)'}}>{appt.clientName}</span>
+                            <span style={{fontSize: '0.75rem', color: 'var(--text-gray)'}}>{appt.action}</span>
+                          </div>
+                        </td>
+                        <td><span style={{fontWeight: '700'}}>{appt.price}</span></td>
+                        <td>
+                          <div className="doc-actions">
+                            <button onClick={() => handleDocument('Devis généré', appt)} className="btn-doc export" title="Générer Devis">
+                              Devis
+                            </button>
+                            <button onClick={() => handleDocument('Contrat généré', appt)} className="btn-doc export" title="Générer Contrat">
+                              Contrat
+                            </button>
+                            <button onClick={() => handleDocument('Facture générée', appt)} className="btn-doc export-main" title="Générer Facture">
+                              Facture
+                            </button>
+                            <button onClick={() => handleDocument('Document importé', appt)} className="btn-doc import" title="Importer un document signé">
+                              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        )}
       </div>
 
       {/* MODALE DE DÉTAILS DU RENDEZ-VOUS */}
       {selectedApptDetails && (
-        <div className="appt-modal-overlay" onClick={() => setSelectedApptDetails(null)}>
+        <div className="appt-modal-overlay" onClick={() => { setSelectedApptDetails(null); setShowStartForm(false); }}>
           <div className="appt-modal" onClick={(e) => e.stopPropagation()}>
             <div className="appt-modal-header">
               <h3>Détails de la prestation</h3>
-              <button className="btn-close-modal" aria-label="Fermer" onClick={() => setSelectedApptDetails(null)}>
+              <button className="btn-close-modal" aria-label="Fermer" onClick={() => { setSelectedApptDetails(null); setShowStartForm(false); }}>
                 <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>

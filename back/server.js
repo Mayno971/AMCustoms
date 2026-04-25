@@ -73,6 +73,20 @@ app.post('/api/appointments', (req, res) => {
   });
 });
 
+// 2b. Suivre une réservation (Invités / Clients)
+app.get('/api/appointments/track', (req, res) => {
+  const { email, ref } = req.query;
+  if (!email || !ref) {
+    return res.status(400).json({ error: 'Email et numéro de suivi requis.' });
+  }
+  
+  const appointment = appointments.find(a => a.email === email && a.ref === ref);
+  if (!appointment) {
+    return res.status(404).json({ error: 'Aucune réservation trouvée avec ces identifiants.' });
+  }
+  res.json({ appointment });
+});
+
 // 3. Annuler un rendez-vous
 app.put('/api/appointments/:id/cancel', (req, res) => {
   const apptId = parseInt(req.params.id, 10);
@@ -122,7 +136,29 @@ app.post('/api/auth/login', (req, res) => {
   if (!user) {
     return res.status(401).json({ error: 'Identifiants incorrects.' });
   }
-  res.json({ message: 'Connexion réussie.', user });
+
+  // Génération d'un code A2F à 6 chiffres
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  user.twoFactorCode = code;
+
+  // Simulation de l'envoi du code (SMS/Email)
+  console.log(`\n🔐 [SÉCURITÉ A2F] Code de connexion pour ${email} : ${code}\n`);
+
+  res.json({ message: 'Veuillez saisir le code A2F.', requires2FA: true, email: user.email });
+});
+
+// 5b. Vérification du code A2F (Double Facteur)
+app.post('/api/auth/verify-2fa', (req, res) => {
+  const { email, code } = req.body;
+  const user = users.find(u => u.email === email);
+
+  if (!user || user.twoFactorCode !== code) {
+    return res.status(401).json({ error: 'Code de vérification incorrect ou expiré.' });
+  }
+
+  // Nettoyage du code une fois utilisé pour éviter la réutilisation
+  user.twoFactorCode = null;
+  res.json({ message: 'Connexion sécurisée réussie.', user });
 });
 
 // 6. Réinitialisation du mot de passe (Forgot Password)
@@ -165,7 +201,7 @@ app.get('/api/admin/appointments', (req, res) => {
 // 8. Modifier le statut d'une réservation (Admin)
 app.put('/api/admin/appointments/:id/status', (req, res) => {
   const apptId = parseInt(req.params.id, 10);
-  const { status } = req.body;
+  const { status, startTime, endTime } = req.body;
 
   const appointment = appointments.find(a => a.id === apptId);
   if (!appointment) {
@@ -173,12 +209,18 @@ app.put('/api/admin/appointments/:id/status', (req, res) => {
   }
 
   appointment.status = status;
+  if (startTime) appointment.startTime = startTime;
+  if (endTime) appointment.endTime = endTime;
 
   // Mettre à jour le statut dans la fiche de l'utilisateur lié
   const user = users.find(u => u.email === appointment.userId);
   if (user) {
     const userAppt = user.appointments.find(a => a.id === apptId);
-    if (userAppt) userAppt.status = status;
+    if (userAppt) {
+      userAppt.status = status;
+      if (startTime) userAppt.startTime = startTime;
+      if (endTime) userAppt.endTime = endTime;
+    }
   }
 
   res.json({ message: 'Statut mis à jour.', appointment });

@@ -85,9 +85,11 @@ function Accueil() {
 
     const currentUser = JSON.parse(localStorage.getItem('am_customs_current_user'));
     const isGuest = !currentUser;
+    const bookingRef = `AM-${Math.floor(10000 + Math.random() * 90000)}`; // Génération du numéro de suivi
     
     const newAppt = {
       id: Date.now(),
+      ref: bookingRef,
       userId: isGuest ? `guest_${Date.now()}` : currentUser.email,
       clientName: isGuest ? `${guestFirstname} ${guestLastname}` : `${currentUser.firstname} ${currentUser.lastname}`,
       email: isGuest ? guestEmail : currentUser.email,
@@ -125,6 +127,11 @@ function Accueil() {
       const allUsers = JSON.parse(localStorage.getItem('am_customs_users')) || [];
       const updatedUsers = allUsers.map(u => u.email === updatedUser.email ? updatedUser : u);
       localStorage.setItem('am_customs_users', JSON.stringify(updatedUsers));
+    } else {
+      // Sauvegarde de secours locale pour les invités
+      const guestAppts = JSON.parse(localStorage.getItem('am_customs_guest_appts')) || [];
+      guestAppts.push(newAppt);
+      localStorage.setItem('am_customs_guest_appts', JSON.stringify(guestAppts));
     }
 
     setIsModalOpen(false);
@@ -132,8 +139,13 @@ function Accueil() {
     setBookingTime('');
     
     // Affichage de la notification de succès
-    setToastMessage(`Rendez-vous confirmé le ${bookingDate} à ${bookingTime}`);
-    setTimeout(() => setToastMessage(''), 5000);
+    if (isGuest) {
+      setToastMessage(`Réservation confirmée ! N° de suivi : ${bookingRef}. Un e-mail récapitulatif vous a été envoyé.`);
+      setTimeout(() => setToastMessage(''), 10000); // On laisse 10s pour que l'invité note le code
+    } else {
+      setToastMessage(`Rendez-vous confirmé le ${bookingDate} à ${bookingTime}`);
+      setTimeout(() => setToastMessage(''), 5000);
+    }
   };
 
   return (

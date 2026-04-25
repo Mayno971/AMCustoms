@@ -27,6 +27,13 @@ function Register() {
       return;
     }
 
+    // Validation stricte du mot de passe
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      setError('Le mot de passe doit contenir au moins 8 caractères, incluant une majuscule, une minuscule, un chiffre et un caractère spécial.');
+      return;
+    }
+
     try {
       // Tentative d'inscription sur le serveur
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -102,6 +109,7 @@ function Register() {
           <div className="form-group">
             <label htmlFor="password">Mot de passe</label>
             <input type="password" id="password" placeholder="••••••••" value={formData.password} onChange={handleChange} required />
+            <span style={{fontSize: '0.75rem', color: 'var(--text-gray)', marginTop: '0.25rem'}}>8 caractères min. (1 majuscule, 1 chiffre, 1 spécial)</span>
           </div>
 
           <button type="submit" className="btn-submit">S'inscrire</button>
