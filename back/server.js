@@ -15,7 +15,7 @@ let users = [
     firstname: 'Admin',
     lastname: 'Prestataire',
     email: 'admin@amcustoms.fr',
-    password: 'admin', // Mot de passe simple pour le test
+    password: 'admin', 
     role: 'admin',
     appointments: []
   }
@@ -159,8 +159,6 @@ app.get('/api/admin/users', (req, res) => {
 
 // 7. Obtenir toutes les réservations
 app.get('/api/admin/appointments', (req, res) => {
-  // On pourrait filtrer ici, mais on renvoie tout pour que 
-  // le front puisse les placer dynamiquement sur son calendrier
   res.json({ appointments });
 });
 

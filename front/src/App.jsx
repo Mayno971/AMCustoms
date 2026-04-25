@@ -35,6 +35,9 @@ function AppContent() {
         <nav className="app-nav" aria-label="Menu principal">
           <div className="nav-left">
             <Link to="/" className="nav-brand" aria-label="Retour à l'accueil AM Customs">
+              <svg width="24" height="24" fill="none" stroke="var(--primary-orange)" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+              </svg>
               AM <span className="text-accent">CUSTOMS</span>
             </Link>
             
