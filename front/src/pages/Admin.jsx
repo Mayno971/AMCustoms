@@ -202,6 +202,21 @@ function Admin() {
     alert(`${type} pour ${appt.clientName} (Prestation n°${appt.id}) traité avec succès !`);
   };
 
+  // Gérer le changement rapide de statut depuis le menu déroulant de la liste (pour capturer l'heure)
+  const handleDropdownChange = (e, appt) => {
+    e.stopPropagation();
+    const newStatus = e.target.value;
+    
+    let startTime = appt.startTime || null;
+    let endTime = appt.endTime || null;
+    const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', ':');
+
+    if (newStatus === 'En cours' && !startTime) startTime = now;
+    if (newStatus === 'Terminé' && !endTime) endTime = now;
+
+    handleStatusChange(appt.id, newStatus, startTime, endTime);
+  };
+
   // --- Logique de navigation du Calendrier ---
   const adjustDate = (days) => {
     const d = new Date(selectedDate);
@@ -256,12 +271,12 @@ function Admin() {
                   <div className="appt-extra-details">"{appt.details}"</div>
                 )}
               </div>
-              {/* e.stopPropagation() empêche d'ouvrir la modale si on clique juste sur le sélecteur de statut */}
-              <div className={`appt-status ${getStatusClass(appt.status)}`} onClick={(e) => e.stopPropagation()}>
+              <div className={`appt-status ${getStatusClass(appt.status)}`}>
                 <select 
                   value={appt.status} 
                   aria-label={`Modifier le statut de la réservation pour ${appt.clientName}`}
-                  onChange={(e) => handleStatusChange(appt.id, e.target.value)}
+                  onChange={(e) => handleDropdownChange(e, appt)}
+                  onClick={(e) => e.stopPropagation()}
                   className="status-select"
                 >
                   <option value="En attente">En attente</option>
