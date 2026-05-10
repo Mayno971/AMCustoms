@@ -1,0 +1,134 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: rgba(11, 12, 16, 0.85); /* Verre sombre */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(16px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.navbarBrand {
+  display: flex;
+  align-items: center;
+}
+
+.navbarLogo {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  text-decoration: none;
+  color: var(--text-main);
+  transition: color var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  span {
+    color: var(--primary-orange);
+  }
+
+  &:hover {
+    color: var(--primary-orange);
+  }
+}
+
+.navbarMenu {
+  display: none; /* Caché sur mobile par défaut */
+  gap: 2rem;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @media (min-width: 768px) {
+    display: flex;
+  }
+}
+
+.navLink {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-gray);
+  text-decoration: none;
+  transition: all var(--transition-smooth);
+  position: relative;
+  padding: 0.5rem 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0px;
+    left: 0;
+    background-color: var(--primary-orange);
+    transform-origin: bottom right;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &:hover {
+    color: var(--primary-orange);
+
+    &::after {
+      transform: scaleX(1);
+      transform-origin: bottom left;
+    }
+  }
+}
+
+.btnLogin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--primary-orange);
+  color: white;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all var(--transition-smooth);
+  box-shadow: var(--shadow-orange);
+
+  &:hover {
+    background-color: var(--primary-orange-hover);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 15px 25px -5px rgba(234, 88, 12, 0.5);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.btnLogout {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-gray);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+
+  &:hover {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}

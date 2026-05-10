@@ -1,54 +1,48 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import styles from './Footer.module.scss';
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
-
   return (
-    <footer className="footer">
-      <div className="footer-content">
-        <div className="footer-section">
-          <h3 className="footer-logo">AM<span>Customs</span></h3>
-          <p className="footer-description">
-            L'excellence de la personnalisation automobile. Performance, esthétique et protection pour votre véhicule.
+    <footer className={styles.footer}>
+      <div className={styles.container}>
+        
+        <div className={styles.brand}>
+          <Link to="/" className={styles.logo}>
+            AM<span>Customs</span>
+          </Link>
+          <p>
+            L'excellence automobile à votre service. Spécialistes en detailing, personnalisation et protection de véhicules de prestige.
           </p>
         </div>
 
-        <div className="footer-section">
+        <div className={styles.links}>
           <h4>Navigation</h4>
-          <ul>
-            <li><Link to="/">Accueil</Link></li>
-            <li><Link to="/track">Suivre ma réservation</Link></li>
-            <li><Link to="/login">Connexion</Link></li>
-          </ul>
+          <Link to="/">Accueil</Link>
+          <a href="#prestations">Nos Prestations</a>
+          <Link to="/track">Suivre une réservation</Link>
+          <Link to="/login">Espace Client</Link>
         </div>
 
-        <div className="footer-section">
+        <div className={styles.contact}>
           <h4>Contact</h4>
-          <ul>
-            <li>📍 123 Avenue de l'Automobile, Paris</li>
-            <li>📞 01 23 45 67 89</li>
-            <li>✉️ contact@amcustoms.fr</li>
-          </ul>
-        </div>
-
-        <div className="footer-section">
-          <h4>Horaires</h4>
-          <ul>
-            <li>Lun - Ven: 09:00 - 18:00</li>
-            <li>Samedi: 10:00 - 16:00</li>
-            <li>Dimanche: Fermé</li>
-          </ul>
+          <p>
+            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.242-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            123 Avenue de l'Excellence, 75000 Paris
+          </p>
+          <p>
+            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            contact@amcustoms.fr
+          </p>
+          <p>
+            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+            01 23 45 67 89
+          </p>
         </div>
       </div>
 
-      <div className="footer-bottom">
-        <p>&copy; {currentYear} AM Customs. Tous droits réservés.</p>
-        <div className="footer-socials">
-          <a href="#" aria-label="Instagram">IG</a>
-          <a href="#" aria-label="Facebook">FB</a>
-          <a href="#" aria-label="TikTok">TK</a>
-        </div>
+      <div className={styles.bottom}>
+        <p>&copy; {new Date().getFullYear()} AM Customs. Tous droits réservés.</p>
       </div>
     </footer>
   );

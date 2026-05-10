@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import './BookingModal.scss';
 
 const TIME_SLOTS = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
 
-const BookingModal = ({ onClose, selectedService, onSuccess }) => {
+const BookingModal = ({ onClose, selectedService, onSuccess, className = '' }) => {
   const tomorrowDate = new Date();
   tomorrowDate.setDate(tomorrowDate.getDate() + 1);
   const year = tomorrowDate.getFullYear();
@@ -118,7 +119,7 @@ const BookingModal = ({ onClose, selectedService, onSuccess }) => {
   };
 
   return (
-    <div className="booking-modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div className={`booking-modal-overlay ${className}`} onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div className="booking-modal" onClick={e => e.stopPropagation()}>
         <div className="booking-modal-header">
           <h3 id="modal-title">Réserver : {selectedService?.title}</h3>

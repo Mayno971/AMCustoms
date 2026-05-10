@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // Logique de déconnexion (ex: suppression du token)
     setUser(null);
   };
 
