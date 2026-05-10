@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './Auth.css'; // Fichier CSS partagé pour l'authentification
+import './Auth.scss'; // Fichier SCSS partagé pour l'authentification
 
 function Login() {
   const navigate = useNavigate();

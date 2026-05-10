@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './Auth.css';
+import './Auth.scss';
 
 function TrackBooking() {
   const [formData, setFormData] = useState({ email: '', ref: '' });

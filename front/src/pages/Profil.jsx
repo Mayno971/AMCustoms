@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import './Profil.css';
+import './Profil.scss';
+import { useAuth } from '../hooks/useAuth';
 
 function Profil() {
   const { nom } = useParams();
@@ -11,6 +12,7 @@ function Profil() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
+  const { logout } = useAuth();
 
   useEffect(() => {
     // On récupère l'utilisateur connecté depuis le localStorage
@@ -25,12 +27,7 @@ function Profil() {
   }, [navigate, nom]);
 
   const handleLogout = () => {
-    // Simulation d'une déconnexion SSO Globale
-    localStorage.removeItem('am_customs_current_user');
-    sessionStorage.clear();
-    
-    // Redirection stricte vers le login
-    navigate('/login');
+    logout();
   };
 
   const handleCancelAppt = async (id) => {

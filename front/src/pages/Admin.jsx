@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Admin.css';
+import './Admin.scss';
+import { useAuth } from '../hooks/useAuth';
 
 function Admin() {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ function Admin() {
   // Pagination pour les clients
   const [usersCurrentPage, setUsersCurrentPage] = useState(1);
   const USERS_PER_PAGE = 8;
+  const { logout } = useAuth();
 
   useEffect(() => {
     // Sécurité : on vérifie que c'est bien l'admin qui est connecté
@@ -89,8 +91,7 @@ function Admin() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('am_customs_current_user');
-    navigate('/');
+    logout();
   };
 
   // Permet à l'admin de changer l'état d'un RDV
